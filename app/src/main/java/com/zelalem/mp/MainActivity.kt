@@ -3,29 +3,57 @@ package com.zelalem.mp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.random.Random
+import android.widget.TableRow
+import android.widget.TextView
+import kotlinx.android.synthetic.main.table_layout.*
 
 class MainActivity : AppCompatActivity() {
-    var fastFoods = ArrayList<String>(arrayListOf("Hamburger", "Pizza", "Mexican", "American", "Chinese"))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.table_layout)
     }
 
-    fun btnDecideClick(view: View){
-        txt_food_name.text = getRandomFood(fastFoods);
+
+
+    fun onAdd(view: View){
+        // Creating new row
+        val tableRow = TableRow(this)
+
+        val txtVersion = TextView(this)
+        txtVersion.text = android_version.text.toString().trim()
+
+        val txtCodeName = TextView(this)
+        txtCodeName.text = code_name.text.toString().trim()
+
+        // Setting layout params
+
+        val colOne = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT).apply {
+            setMargins(0, 6, 8, 0)
+        }
+
+        txtVersion.setBackgroundResource(R.color.table_row_bg)
+        txtVersion.layoutParams = colOne
+
+        val colTwo = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT).apply {
+            setMargins(0, 6, 0, 0)
+        }
+
+        txtCodeName.setBackgroundResource(R.color.table_row_bg)
+        txtCodeName.layoutParams = colTwo
+
+
+        tableRow.addView(txtVersion, 0)
+        tableRow.addView(txtCodeName, 1)
+        tbl_phone_info.addView(tableRow)
+
+        // Reset input control after insertion
+        resetField()
     }
 
-    private fun getRandomFood(fastFoods: ArrayList<String>): String {
-        var randomFoodIndex = Random.nextInt(0, fastFoods.size);
-        return fastFoods[randomFoodIndex];
-    }
 
-    fun btnAddFoodClick(view: View){
-        var fastFoodName = text_add_new_food.text.toString();
-        fastFoods.add(fastFoodName);
-        text_add_new_food.setText("");
+    private fun resetField(){
+        android_version.setText("")
+        code_name.setText("")
     }
 }
