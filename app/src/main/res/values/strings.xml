@@ -27,4 +27,16 @@
     <string name="layout_no_internet_content_description_logo">Logo</string>
     <string name="login_title">Sign in to your account</string>
     <string name="divider">divider</string>
+    <string name="title">Shop by Category</string>
+    <string name="username" />
+    <string name="create_account">Create your account</string>
+    <string name="btn_label_create_account">Create Account</string>
+    <string name="first_name">First name*</string>
+    <string name="last_name_required">Last name*</string>
+    <string name="email_address_required">Email address*</string>
+    <string name="password_required">Password*</string>
+    <string name="sr_first_name">First name</string>
+    <string name="sr_last_name">Last name</string>
+    <string name="sr_email">Email</string>
+    <string name="sr_password">Password</string>
 </resources>
