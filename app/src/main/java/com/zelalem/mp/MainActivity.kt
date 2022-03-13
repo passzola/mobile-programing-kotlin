@@ -1,104 +1,27 @@
 package com.zelalem.mp
 
-import android.app.Activity
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.EditText
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import kotlinx.android.synthetic.main.walmart_login.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    private val registeredUsers = mutableListOf<User>(User("Zelalme", "Mekuria", "zelalem@gmail.com", "zelalem"),
-    User("Henok", "Chekol", "henok@gmail.com", "henok"),
-    User("eskinder", "Abebe", "eskinder@gmail.com", "eskinder"),
-    User("Mintesnot", "Desalgi", "minte@gmail.com", "minte"),
-    User("Amanuel", "Chorito", "aman@gmail.com", "aman"))
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.walmart_login)
+        setContentView(R.layout.activity_main)
 
-        var resultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // Using Kotlin null check
-                if(result.data?.hasExtra("user")!!){
-                    registeredUsers.add(result.data?.getSerializableExtra("user") as User)
-                }
-            }
-        }
+        val products = ArrayList<Product>()
 
-        btn_create_account.setOnClickListener{
-            onCreateAccount(resultLauncher)
-        }
-    }
+        products.add(Product("RGA Voyger 7 16 GB Android tablet", 35.00, "Blue", "phone", "34567", "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since"))
+        products.add(Product("HP Flyer Red 15 Laptop", 299.00, "Black & Red", "laptop", "34567", "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since"))
+        products.add(Product("Vizio 70 classic 4k", 1298.00, "Black", "tv", "34567", "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since"))
+        products.add(Product("Epson WorkForce WF-2750", 69.00, "Black", "printer", "34567", "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since"))
 
-    // On signup
-    fun onLogin(view: View){
-        val email = findViewById<EditText>(R.id.email).text.toString()
-        val password = findViewById<EditText>(R.id.password).text.toString()
+        product_recycler.layoutManager = LinearLayoutManager(this)
+        val adaptor = MyAdaptor(products)
 
-        val user = getUserInfo(email, password)
+        product_recycler.adapter = adaptor
 
-        if(user != null){
-            val intent = Intent(this, ShoppingCategoryActivity::class.java)
-            intent.putExtra("username",user.userName )
-
-
-            startActivity(intent)
-        }
-    }
-
-    // forgot password
-    fun onForgotPassword(view: View){
-        val userEmail = email.text.trim().toString()
-
-        val user = getUserByUsername(userEmail)
-
-        if(user != null){
-            var to = arrayOf(userEmail)
-            val intent = Intent()
-            intent.action = Intent.ACTION_SEND
-            intent.type = "text/plain"
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Sending lost password")
-            intent.putExtra(Intent.EXTRA_EMAIL, to)
-            intent.putExtra(Intent.EXTRA_TEXT, user.password)
-
-            startActivity(intent)
-        }
-    }
-
-    // on create account
-    fun onCreateAccount(launcher: ActivityResultLauncher<Intent>){
-        val registrationIntent = Intent(this, RegisterActivity::class.java)
-        launcher.launch(registrationIntent)
-    }
-
-    private fun getUserInfo(username: String, password: String): User?{
-        var userInfo: User? = null
-
-        for (user in registeredUsers){
-            if(user.userName == username && user.password == password){
-                userInfo = user
-            }
-        }
-
-        return userInfo
-    }
-
-    private fun getUserByUsername(userName: String?): User?{
-
-        var existingUser: User? = null
-
-        for(user in registeredUsers){
-            if(user.userName == userName){
-                existingUser = user
-            }
-        }
-
-        return existingUser
+        // when user click on the recycler item get all the item and pass to the next activity
     }
 }
