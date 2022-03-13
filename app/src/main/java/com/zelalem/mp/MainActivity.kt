@@ -1,104 +1,92 @@
 package com.zelalem.mp
 
-import android.app.Activity
-import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.EditText
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import kotlinx.android.synthetic.main.walmart_login.*
+import android.widget.*
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity() {
-    private val registeredUsers = mutableListOf<User>(User("Zelalme", "Mekuria", "zelalem@gmail.com", "zelalem"),
-    User("Henok", "Chekol", "henok@gmail.com", "henok"),
-    User("eskinder", "Abebe", "eskinder@gmail.com", "eskinder"),
-    User("Mintesnot", "Desalgi", "minte@gmail.com", "minte"),
-    User("Amanuel", "Chorito", "aman@gmail.com", "aman"))
+    private var score = 0
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.walmart_login)
+        setContentView(R.layout.activity_quiz_app)
 
-        var resultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // Using Kotlin null check
-                if(result.data?.hasExtra("user")!!){
-                    registeredUsers.add(result.data?.getSerializableExtra("user") as User)
+        findViewById<Button>(R.id.btn_reset).setOnClickListener{
+            reset()
+        }
+
+        findViewById<Button>(R.id.btn_submit).setOnClickListener{
+            onSubmit()
+        }
+    }
+
+    private fun reset(){
+        score = 0
+        findViewById<RadioGroup>(R.id.radio_group).clearCheck()
+        findViewById<CheckBox>(R.id.q_2_a_1).isChecked = false
+        findViewById<CheckBox>(R.id.q_2_a_2).isChecked = false
+        findViewById<CheckBox>(R.id.q_2_a_3).isChecked = false
+    }
+
+    fun onRadioButtonSelect(view: View){
+        if(view is RadioButton){
+            var cheked = view.isChecked
+            when(view.getId()){
+                R.id.q_1_an_1  ->
+                    if(cheked)
+                        score+=50
+            }
+        }
+    }
+
+    fun onCheckBoxSelected(view: View){
+        if(view is CheckBox){
+            var cheked = view.isChecked
+            when(view.getId()){
+                R.id.q_2_a_1  ->
+                    if(cheked)
+                        score+=50
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun onSubmit(){
+
+        val current = LocalDateTime.now()
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+        val date = current.format(dateFormatter)
+        val time = current.format(timeFormatter)
+        val message = if(score > 0)
+            "Congratulations! You submitted on current $date and $time, You got $score%"
+        else "Try again."
+        val title = "Quiz App Result"
+        displayDialog(title, message)
+    }
+
+    private fun displayDialog(title: String, message: String){
+        val alertDialog: AlertDialog = this.let {
+            val builder = AlertDialog.Builder(it)
+            builder.apply {
+                setPositiveButton("OK")
+                { dialog, _ ->
+                    reset()
+                    dialog.dismiss()
                 }
             }
+            builder.setMessage(message)
+                .setTitle(title)
+            builder.create()
         }
-
-        btn_create_account.setOnClickListener{
-            onCreateAccount(resultLauncher)
-        }
-    }
-
-    // On signup
-    fun onLogin(view: View){
-        val email = findViewById<EditText>(R.id.email).text.toString()
-        val password = findViewById<EditText>(R.id.password).text.toString()
-
-        val user = getUserInfo(email, password)
-
-        if(user != null){
-            val intent = Intent(this, ShoppingCategoryActivity::class.java)
-            intent.putExtra("username",user.userName )
-
-
-            startActivity(intent)
-        }
-    }
-
-    // forgot password
-    fun onForgotPassword(view: View){
-        val userEmail = email.text.trim().toString()
-
-        val user = getUserByUsername(userEmail)
-
-        if(user != null){
-            var to = arrayOf(userEmail)
-            val intent = Intent()
-            intent.action = Intent.ACTION_SEND
-            intent.type = "text/plain"
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Sending lost password")
-            intent.putExtra(Intent.EXTRA_EMAIL, to)
-            intent.putExtra(Intent.EXTRA_TEXT, user.password)
-
-            startActivity(intent)
-        }
-    }
-
-    // on create account
-    fun onCreateAccount(launcher: ActivityResultLauncher<Intent>){
-        val registrationIntent = Intent(this, RegisterActivity::class.java)
-        launcher.launch(registrationIntent)
-    }
-
-    private fun getUserInfo(username: String, password: String): User?{
-        var userInfo: User? = null
-
-        for (user in registeredUsers){
-            if(user.userName == username && user.password == password){
-                userInfo = user
-            }
-        }
-
-        return userInfo
-    }
-
-    private fun getUserByUsername(userName: String?): User?{
-
-        var existingUser: User? = null
-
-        for(user in registeredUsers){
-            if(user.userName == userName){
-                existingUser = user
-            }
-        }
-
-        return existingUser
+        alertDialog.show()
     }
 }
